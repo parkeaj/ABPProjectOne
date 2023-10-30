@@ -27,6 +27,31 @@ def SpeedofSound(R, y, temperature):
     return a
 
 
+def PolytropicCompressCoefficent(PolytropicE, y):
+    Coefficent = PolytropicE * (y - 1) / y
+    return Coefficent
+
+
+def PolytropicTurbineCoefficent(PolytropicE, y):
+    Coefficent = (y - 1) / (y * PolytropicE)
+    return Coefficent
+
+
+"""
+def PolytropicCompressor(PR, Coefficent, P01, T01):
+    P02 = PR * P01
+    T02 = T01 * (PR ** Coefficent)
+    DeltaT = T02 - T01
+    return P02, T02, DeltaT
+def PolytropicTurbine(Cpc,Cph,nm,DeltaT, Coefficent, P01, T01):
+    P02 = PR * P01
+    T02 = T01 * (PR ** Coefficent)
+    DeltaT = T02 - T01
+    return P02, T02, DeltaT
+
+"""
+
+
 class inlet:
     @staticmethod
     def Temp(velocity, Cp, T0):
@@ -62,16 +87,44 @@ class fan:
 class compressor:
     @staticmethod
     def pressure(P02, compressorpressureratio):
-        after = P02 * compressorpressureratio
-        return after
+        P03 = P02 * compressorpressureratio
+        return P03
 
     @staticmethod
     def temperature(polytropiccompressor, T02, compressorpressureratio, y):
         temp = (compressorpressureratio) ** ((y - 1) / (y * polytropiccompressor))
-        after = T02 * temp
-        return after
+        T03 = T02 * temp
+        return T03
 
     @staticmethod
     def Work(temperatureafter, temperaturebefore, cp):
         workdone = cp * (temperatureafter - temperaturebefore)
         return workdone
+
+
+class combustor:
+    @staticmethod
+    def pressure(PR, P03):
+        P04 = PR * P03
+        return P04
+
+
+class turbine:
+
+    @staticmethod
+    def temperature(WorkCompressor, WorkFan, Cph, T04):
+        T05 = (WorkCompressor + WorkFan) * - 1 / Cph + T04
+        return T05
+
+    @staticmethod
+    def pressure(T04, T05, P04, y, ntinf):
+        PTC = PolytropicTurbineCoefficent(ntinf, y)
+        temp = T04 / T05
+        P05 = temp ** (1 / PTC) * P04
+        return P05
+class nozzle:
+    @staticmethod
+    def temperature():
+
+    @staticmethod
+    def pressure():
