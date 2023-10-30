@@ -113,7 +113,7 @@ class turbine:
 
     @staticmethod
     def temperature(BPR, Cpc, Cph, nm, T01, T02, T02_1, T03, T04):
-        temp = (BPR * Cpc * (T02_1 - T02) - 0 * Cpc * (T02_1 - T03) - Cph * nm * T04 + Cpc * (T02_1 - T02)) * -1
+        temp = (BPR * Cpc * (T02_1 - T02) -   Cpc * (T02_1 - T03) - Cph * nm * T04 + Cpc * (T02_1 - T02)) * -1
         T05 = temp / (Cph * nm)
         return T05
 
