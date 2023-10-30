@@ -112,9 +112,14 @@ class combustor:
 class turbine:
 
     @staticmethod
-    def temperature(WorkCompressor, WorkFan, Cph, T04):
-        T05 = (WorkCompressor + WorkFan) * - 1 / Cph + T04
+    def temperature(BPR, Cpc, Cph, nm, T01, T02, T02_1, T03, T04):
+        temp = (BPR * Cpc * (T02_1 - T02) - Cpc * (T02_1 - T03) - Cph * nm * T04 + Cpc * (T02_1 - T02)) * -1
+        T05 = temp / Cph / nm
         return T05
+
+    """def temperature(WorkCompressor, WorkFan, Cph, T04):
+        T05 = (WorkCompressor + WorkFan) * - 1 / Cph + T04
+        return T05"""
 
     @staticmethod
     def pressure(T04, T05, P04, y, ntinf):
@@ -122,9 +127,15 @@ class turbine:
         temp = T04 / T05
         P05 = temp ** (1 / PTC) * P04
         return P05
+
+
 class nozzle:
     @staticmethod
     def temperature():
+        T06 = 1
+        return T06
 
     @staticmethod
     def pressure():
+        P06 = 1
+        return P06
