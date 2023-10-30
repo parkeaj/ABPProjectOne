@@ -1,5 +1,6 @@
 import numpy as np
 from Classes.EngineStates import *
+from Equations.Equations import *
 
 # Initial Values for Static Values
 h = 11  # Km
@@ -8,8 +9,10 @@ M0 = 0.85  #
 BPR = 10  #
 Yc = 1.4  #
 Yh = 1.333  #
+R = 287
 FPR = 1.5  #
 CPR = 36  #
+S = 285.0  # m^2
 CombustorPressureLoss = 0.96  #
 IntakeEfficiency = 0.98  #
 MechEfficiency = 0.99  #
@@ -19,6 +22,8 @@ PolytropicTurbine = 0.9  #
 CombustorEfficiency = 0.99  #
 NozzleEfficiency = 0.99  #
 HFuel = 431000.0  # Kj/kg
+Cpc = 1005
+Cph = 1148
 
 PAmbient = 22696.8  # Pa
 TAmbient = 216.775245  # K
@@ -40,7 +45,6 @@ Combustor = EngineStates()
 Turbine = EngineStates()
 TurbineNozzle = EngineStates()
 
-
 EngineState = {
     "Ambient": Ambient, "Intake": Intake, "Fan": Fan, "FanNozzle": FanNozzle, "Compressor": Compressor,
     "Combustor": Combustor,
@@ -55,5 +59,26 @@ EngineState["Combustor"].Stage = "Combustor"
 EngineState["Turbine"].Stage = "Turbine"
 EngineState["TurbineNozzle"].Stage = "TurbineNozzle"
 
+q = DynamicPressure(Yc, PAmbient, M0)
+Cl = LiftCoefficient(Weight, S, q)
+CD = DragCoefficient(Cl)
+A0 = SpeedofSound(R, Yc, TAmbient)
+V0 = A0 * M0
+PFC = PolytropicTurbineCoefficent(PolytropicFan, Yc)
+PCC = PolytropicTurbineCoefficent(PolytropicCompressor, Yc)
 
+T02 = inlet.Temp(V0, Cpc, TAmbient)
+P02 = inlet.Pressure(Yc, V0, TAmbient, PAmbient, Cpc, IntakeEfficiency)
 
+T02_1 = fan.temperature(PolytropicFan, T02, FPR, Yc)
+P02_1 = fan.pressure(P02, FPR)
+
+T03 = compressor.temperature(PolytropicCompressor, T02, CPR, Yc)
+P03 = compressor.pressure(P02, CPR)
+
+T04 = 1560
+P04 = P03 * CombustorPressureLoss
+
+T05 = turbine.temperature(BPR,Cpc,Cph,MechEfficiency,T02,T02,T02_1,T03,T04)
+P05 = turbine.pressure(T04,T05,P04,Yh,PolytropicTurbine)
+print("yes")
