@@ -73,12 +73,19 @@ P02 = inlet.Pressure(Yc, V0, TAmbient, PAmbient, Cpc, IntakeEfficiency)
 T02_1 = fan.temperature(PolytropicFan, T02, FPR, Yc)
 P02_1 = fan.pressure(P02, FPR)
 
-T03 = compressor.temperature(PolytropicCompressor, T02, CPR, Yc)
-P03 = compressor.pressure(P02, CPR)
+T03 = compressor.temperature(PolytropicCompressor, T02_1, CPR, Yc)
+P03 = compressor.pressure(P02_1, CPR)
 
 T04 = 1560
 P04 = P03 * CombustorPressureLoss
 
-T05 = turbine.temperature(BPR,Cpc,Cph,MechEfficiency,T02,T02,T02_1,T03,T04)
-P05 = turbine.pressure(T04,T05,P04,Yh,PolytropicTurbine)
-print("yes")
+T05 = turbine.temperature(BPR, Cpc, Cph, MechEfficiency, T02, T02, T02_1, T03, T04)
+# T05 = turbine.temperatureWork(Cph,Cpc,T02,T03,T04)
+P05 = turbine.pressure(T04, T05, P04, Yh, PolytropicTurbine)
+
+P9 = PAmbient
+T9 = nozzle.temperature(NozzleEfficiency, T05, PAmbient, P05, Yh)
+M9 = nozzle.Mach(T05, T9, Yh)
+V9 = M9 * np.sqrt(Yh * R * T9)
+print(M9)
+print(V9)

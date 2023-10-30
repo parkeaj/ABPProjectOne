@@ -113,13 +113,16 @@ class turbine:
 
     @staticmethod
     def temperature(BPR, Cpc, Cph, nm, T01, T02, T02_1, T03, T04):
-        temp = (BPR * Cpc * (T02_1 - T02) - Cpc * (T02_1 - T03) - Cph * nm * T04 + Cpc * (T02_1 - T02)) * -1
-        T05 = temp / Cph / nm
+        temp = (BPR * Cpc * (T02_1 - T02) - 0 * Cpc * (T02_1 - T03) - Cph * nm * T04 + Cpc * (T02_1 - T02)) * -1
+        T05 = temp / (Cph * nm)
         return T05
 
-    """def temperature(WorkCompressor, WorkFan, Cph, T04):
-        T05 = (WorkCompressor + WorkFan) * - 1 / Cph + T04
-        return T05"""
+    @staticmethod
+    def temperatureWork(Cph, Cpc, T02, T03,T04):
+        Temp1= Cpc * (T03-T02)
+        Temp2 = -1 *Temp1/ Cph
+        T05 = Temp2 + T04
+        return T05
 
     @staticmethod
     def pressure(T04, T05, P04, y, ntinf):
@@ -131,11 +134,13 @@ class turbine:
 
 class nozzle:
     @staticmethod
-    def temperature():
-        T06 = 1
-        return T06
+    def temperature(Ni, T05, P9, P06, y):
+        T9 =  (Ni * T05 * (1 - (P9 / P06) ** ((y - 1) / y)) )
+        return T9
 
     @staticmethod
-    def pressure():
-        P06 = 1
-        return P06
+    def Mach(T05, T9, y):
+        temp1 = 2 * (T05 - T9)
+        temp2 = T9 * (y - 1)
+        M = np.sqrt(temp1/temp2)
+        return M
