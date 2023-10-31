@@ -36,25 +36,32 @@ def PolytropicTurbineCoefficent(PolytropicE, y):
     Coefficent = (y - 1) / (y * PolytropicE)
     return Coefficent
 
-def F_m0(drag,mdot_f,mdot_c):
-    F_m0 = drag/(mdot_c+mdot_f)
+
+def F_m0(drag, mdot_f, mdot_c):
+    F_m0 = drag / (mdot_c + mdot_f)
     return F_m0
 
-def TSFC(drag,mdot_f):
-    TSFC = mdot_f/drag
+
+def TSFC(drag, mdot_f):
+    TSFC = mdot_f / drag
     return TSFC
 
-def fa_ratio(t04,t03,nb,cp,Q,mdot_f,mdot_c):
-    f = ((t04/t03)-1)/((nb*Q/cp*t03)-(t04/t03))
-    mdot_h = f*(mdot_f+mdot_c)
+
+def fa_ratio(t04, t03, nb, cp, Q, mdot_f, mdot_c):
+    f = ((t04 / t03) - 1) / ((nb * Q / cp * t03) - (t04 / t03))
+    mdot_h = f * (mdot_f + mdot_c)
     return f, mdot_h
 
-def perf_eff(mdot_h,mdot_c,mdot_f,c9,c19,Ca,Qf):
-    mdot_a = mdot_f +mdot_c
-    nt = (0.5*(mdot_c*c9**2+mdot_f*c19**2- mdot_a*Ca**2))/(mdot_h*Qf)
-    np = (Ca*(mdot_f*(c19-Ca)+mdot_c*(c9-Ca)))/(0.5*(mdot_c*c9**2+mdot_f*c19**2- mdot_a*Ca**2))
-    no = nt*np
-    return nt,np,no
+
+def perf_eff(mdot_h, mdot_c, mdot_f, c9, c19, Ca, Qf):
+    mdot_a = mdot_f + mdot_c
+    nt = (0.5 * (mdot_c * c9 ** 2 + mdot_f * c19 ** 2 - mdot_a * Ca ** 2)) / (mdot_h * Qf)
+    np = (Ca * (mdot_f * (c19 - Ca) + mdot_c * (c9 - Ca))) / (
+            0.5 * (mdot_c * c9 ** 2 + mdot_f * c19 ** 2 - mdot_a * Ca ** 2))
+    no = nt * np
+    return nt, np, no
+
+
 """
 def PolytropicCompressor(PR, Coefficent, P01, T01):
     P02 = PR * P01
@@ -73,7 +80,7 @@ def PolytropicTurbine(Cpc,Cph,nm,DeltaT, Coefficent, P01, T01):
 class inlet:
     @staticmethod
     def Temp(velocity, Cp, T0):
-        T02 = T0 + 0.98*(velocity ** 2 / (2 * Cp))
+        T02 = T0 + 0.98 * (velocity ** 2 / (2 * Cp))
         return T02
 
     @staticmethod
@@ -126,22 +133,39 @@ class combustor:
         P04 = PR * P03
         return P04
 
+    @staticmethod
+    def massflow(BPR, Ca, Cc, Ch, Drag):
+        Temp1 = - (BPR + 1) * Drag
+        Temp2 = BPR * (Ca - Cc) + Ca - Ch
+        m = Temp1 / Temp2
+        MassFlowCore = m / (BPR + 1)
+        MassFlowNonCore = m * BPR / (BPR + 1)
+        return m, MassFlowCore, MassFlowNonCore
+    @staticmethod
+    def FAR(Cph,Cpc,T04,T03,HFuel,Nb,MassFlowCore):
+        Temp1 = Cph * T04 - Cpc * T03
+        Temp2 = Nb * (HFuel - Cph * T04)
+
+        f = Temp1/Temp2
+        MassFlowFuel = MassFlowCore * f
+
+        return f, MassFlowFuel
 
 class turbine:
 
     @staticmethod
     def temperature(BPR, Cpc, Cph, nm, T01, T02, T02_1, T03, T04):
-        #temp = (BPR * Cpc * (T02_1 - T02) -   Cpc * (T02_1 - T03) + Cph * nm * T04)
-        temp = -1 * (BPR * (T02-T02_1)+T02-T03) * Cpc
+        # temp = (BPR * Cpc * (T02_1 - T02) -   Cpc * (T02_1 - T03) + Cph * nm * T04)
+        temp = -1 * (BPR * (T02 - T02_1) + T02 - T03) * Cpc
         T05 = temp / (Cph * nm)
         T05 = T05 - T04
         T05 = T05 * -1
         return T05
 
     @staticmethod
-    def temperatureWork(Cph, Cpc, T02, T03,T04):
-        Temp1= Cpc * (T03-T02)
-        Temp2 = -1 *Temp1/ Cph
+    def temperatureWork(Cph, Cpc, T02, T03, T04):
+        Temp1 = Cpc * (T03 - T02)
+        Temp2 = -1 * Temp1 / Cph
         T05 = Temp2 + T04
         return T05
 
@@ -156,12 +180,12 @@ class turbine:
 class nozzle:
     @staticmethod
     def temperature(Ni, T05, P9, P06, y):
-        T9 =  (Ni * T05 * (1 - (P9 / P06) ** ((y - 1) / y)) )
+        T9 = (Ni * T05 * (1 - (P9 / P06) ** ((y - 1) / y)))
         return T9
 
     @staticmethod
     def Mach(T05, T9, y):
         temp1 = 2 * (T05 - T9)
         temp2 = T9 * (y - 1)
-        M = np.sqrt(temp1/temp2)
+        M = np.sqrt(temp1 / temp2)
         return M
