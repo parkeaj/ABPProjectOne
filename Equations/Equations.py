@@ -113,8 +113,11 @@ class turbine:
 
     @staticmethod
     def temperature(BPR, Cpc, Cph, nm, T01, T02, T02_1, T03, T04):
-        temp = (BPR * Cpc * (T02_1 - T02) -   Cpc * (T02_1 - T03) - Cph * nm * T04 + Cpc * (T02_1 - T02)) * -1
+        #temp = (BPR * Cpc * (T02_1 - T02) -   Cpc * (T02_1 - T03) + Cph * nm * T04)
+        temp = -1 * (BPR * (T02-T02_1)+T02-T03) * Cpc
         T05 = temp / (Cph * nm)
+        T05 = T05 - T04
+        T05 = T05 * -1
         return T05
 
     @staticmethod
@@ -127,8 +130,8 @@ class turbine:
     @staticmethod
     def pressure(T04, T05, P04, y, ntinf):
         PTC = PolytropicTurbineCoefficent(ntinf, y)
-        temp = T04 / T05
-        P05 = temp ** (1 / PTC) * P04
+        temp = T05 / T04
+        P05 = temp ** (PTC) * P04
         return P05
 
 

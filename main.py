@@ -87,5 +87,5 @@ P9 = PAmbient
 T9 = nozzle.temperature(NozzleEfficiency, T05, PAmbient, P05, Yh)
 M9 = nozzle.Mach(T05, T9, Yh)
 V9 = M9 * np.sqrt(Yh * R * T9)
-print(M9)
-print(V9)
+print("Mach is:", M9)
+print("Velocity is:", V9)
