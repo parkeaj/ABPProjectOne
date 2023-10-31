@@ -25,7 +25,7 @@ PolytropicCompressor = 0.9  #
 PolytropicTurbine = 0.9  #
 CombustorEfficiency = 0.99  #
 NozzleEfficiency = 0.99  #
-HFuel = 431000.0  # Kj/kg
+HFuel = 43100.0  # Kj/kg
 Cpc = 1005
 Cph = 1148
 
@@ -95,25 +95,27 @@ V9 = M9 * np.sqrt(Yh * R * T9)
 print(P05 / P9)
 print("Mach is:", M9)
 print("Velocity is:", V9)
-
+print('D =',D)
 
 P19 = PAmbient
 T19 = nozzle.temperature(NozzleEfficiency, T02_1, PAmbient, P02_1, Yc)
 M19 = nozzle.Mach(T02_1, T19, Yc)
 V19 = M19 * np.sqrt(Yc * R * T19)
 
-massTotal, mdot_c, mdot_f = combustor.massflow(BPR, V0, V9, V19, D)
+massTotal,mdot_c, mdot_f = combustor.massflow(BPR, V0, V9, V19, D)
 f0, MassFlowFuel = combustor.FAR(Cph, Cpc, T03, T04, HFuel, CombustorEfficiency, mdot_c)
 
 
 
 F_m00 = F_m0(D, mdot_f, mdot_c)
-TSFC0 = TSFC(D,massTotal,MassFlowFuel)
+TSFC0 = TSFC(D,mdot_f+mdot_c,MassFlowFuel)
 fa_ratio0, mdot_h0 = fa_ratio(T04, T03, CombustorEfficiency, Cpc, HFuel, mdot_f, mdot_c)
 ##
 nt0, np0, no0 = perf_eff(MassFlowFuel, mdot_c, mdot_f, V9, V19, V0, HFuel)
-#print(mdot_c,mdot_f,mdot_h0,MassFlowFuel)
-print(F_m00,nt0,np0,no0)
+
+print(T05,P05,T03,P03)
+print(mdot_c,mdot_f,MassFlowFuel,f0)
+print(F_m00,TSFC0,nt0,np0,no0)
 
 ###################
 #Initial values for Graphs
@@ -123,7 +125,7 @@ CompPR_values = linspace(20, 40, num=100,dtype=float) #20 values between 20-40 c
 
 #Data Lists for Graphs
 #Data when BPR changes 
-BPR_fs_data = []
+BPR_fm0_data = []
 BPR_TSFC_data = []
 BPR_f_data = []
 BPR_eta_t_data = []
@@ -131,7 +133,7 @@ BPR_eta_p_data = []
 BPR_eta_o_data = []
 
 #Data when Fan Pressure Ratio Changes
-Fan_fs_data = []
+Fan_fm0_data = []
 Fan_TSFC_data = []
 Fan_f_data = []
 Fan_eta_t_data = []
@@ -139,7 +141,7 @@ Fan_eta_p_data = []
 Fan_eta_o_data = []
 
 #data lists for compressor pressure ratios
-Comp_fs_data = []
+Comp_fm0_data = []
 Comp_TSFC_data = []
 Comp_f_data = []
 Comp_eta_t_data = []
@@ -199,7 +201,7 @@ def solve_engine(BPR, fan_PR, comp_PR):
 for i in BPR_values:
     x = solve_engine(i, 1.5, 36)
 
-    BPR_fs_data.append(x[0])
+    BPR_fm0_data.append(x[0])
     BPR_TSFC_data.append(x[1])
     BPR_f_data.append(x[2])
     BPR_eta_t_data.append(x[3])
@@ -211,7 +213,7 @@ for i in BPR_values:
 for i in FanPR_values:
     x = solve_engine(10,i,36)
 
-    Fan_fs_data.append(x[0])
+    Fan_fm0_data.append(x[0])
     Fan_TSFC_data.append(x[1])
     Fan_f_data.append(x[2])
     Fan_eta_t_data.append(x[3])
@@ -223,7 +225,7 @@ for i in FanPR_values:
 for i in CompPR_values:
     x =  solve_engine(10,1.5,i)
 
-    Comp_fs_data.append(x[0])
+    Comp_fm0_data.append(x[0])
     Comp_TSFC_data.append(x[1])
     Comp_f_data.append(x[2])
     Comp_eta_t_data.append(x[3])
@@ -231,11 +233,11 @@ for i in CompPR_values:
     Comp_eta_o_data.append(x[5])
 
 
-#Graph for BPR
+# BPR plot
 
 fig1, ax1 = plt.subplots(nrows = 2, ncols=3)
 
-ax1[0,0].plot(BPR_values, BPR_fs_data)
+ax1[0,0].plot(BPR_values, BPR_fm0_data)
 ax1[0,1].plot(BPR_values, BPR_f_data)
 ax1[0,2].plot(BPR_values,BPR_TSFC_data)
 
@@ -243,12 +245,12 @@ ax1[1,0].plot(BPR_values,BPR_eta_t_data)
 ax1[1,1].plot(BPR_values,BPR_eta_p_data)
 ax1[1,2].plot(BPR_values,BPR_eta_o_data)
 
+ax1[0,1].set_title('BPR v. F/m, f, TSFC:(first row) \n and nT, nP, nO(second row)')
 
-
-#Graph for Fan Pressure Ratio
+# FPR plot
 fig2, ax2 = plt.subplots(nrows = 2, ncols=3)
 
-ax2[0,0].plot(FanPR_values, Fan_fs_data)
+ax2[0,0].plot(FanPR_values, Fan_fm0_data)
 ax2[0,1].plot(FanPR_values, Fan_f_data)
 ax2[0,2].plot(FanPR_values,Fan_TSFC_data)
 
@@ -256,12 +258,13 @@ ax2[1,0].plot(FanPR_values,Fan_eta_t_data)
 ax2[1,1].plot(FanPR_values,Fan_eta_p_data)
 ax2[1,2].plot(FanPR_values,Fan_eta_o_data)
 
+ax2[0,1].set_title('FPR v. F/m, f, TSFC:(first row) \n and nT, nP, nO(second row)')
 
 
-#Graph for Compressor Pressure Ratio
+# CPR plot
 fig3,ax3 = plt.subplots(nrows = 2, ncols = 3)
 
-ax3[0,0].plot(CompPR_values, Comp_fs_data)
+ax3[0,0].plot(CompPR_values, Comp_fm0_data)
 ax3[0,1].plot(CompPR_values, Comp_f_data)
 ax3[0,2].plot(CompPR_values,Comp_TSFC_data)
 
@@ -269,6 +272,7 @@ ax3[1,0].plot(CompPR_values,Comp_eta_t_data)
 ax3[1,1].plot(CompPR_values,Comp_eta_p_data)
 ax3[1,2].plot(CompPR_values,Comp_eta_o_data)
 
+ax3[0,1].set_title('CPR v. F/m, f, TSFC:(first row, left-right) \n and nT, nP, nO(second row)')
 
 
 plt.show()
