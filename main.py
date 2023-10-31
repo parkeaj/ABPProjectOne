@@ -95,15 +95,12 @@ print("Velocity is:", V9)
 mdot_f = 0
 mdot_c = 0
 P19 = PAmbient
-T19 = nozzle.temperature(NozzleEfficiency, T02_1, PAmbient, P02_1, Yh)
-M19 = nozzle.Mach(T02_1, T19, Yh)
-V19 = M19 * np.sqrt(Yh * R * T19)
+T19 = nozzle.temperature(NozzleEfficiency, T02_1, PAmbient, P02_1, Yc)
+M19 = nozzle.Mach(T02_1, T19, Yc)
+V19 = M19 * np.sqrt(Yc * R * T19)
 
-
-
-
-
-
+MassFlowCore, MassFlowNonCore = combustor.massflow(BPR, V0, V9, V19, D)
+f, MassFlowFuel = combustor.FAR(Cph, Cpc, T03, T04, HFuel, CombustorEfficiency, MassFlowCore)
 
 F_m0 = F_m0(D, mdot_f, mdot_c)
 TSFC = TSFC(D, mdot_f)
