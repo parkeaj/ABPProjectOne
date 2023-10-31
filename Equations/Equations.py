@@ -36,7 +36,25 @@ def PolytropicTurbineCoefficent(PolytropicE, y):
     Coefficent = (y - 1) / (y * PolytropicE)
     return Coefficent
 
+def F_m0(drag,mdot_f,mdot_c):
+    F_m0 = drag/(mdot_c+mdot_f)
+    return F_m0
 
+def TSFC(drag,mdot_f):
+    TSFC = mdot_f/drag
+    return TSFC
+
+def fa_ratio(t04,t03,nb,cp,Q,mdot_f,mdot_c):
+    f = ((t04/t03)-1)/((nb*Q/cp*t03)-(t04/t03))
+    mdot_h = f*(mdot_f+mdot_c)
+    return f, mdot_h
+
+def perf_eff(mdot_h,mdot_c,mdot_f,c9,c19,Ca,Qf):
+    mdot_a = mdot_f +mdot_c
+    nt = (0.5*(mdot_c*c9**2+mdot_f*c19**2- mdot_a*Ca**2))/(mdot_h*Qf)
+    np = (Ca*(mdot_f*(c19-Ca)+mdot_c*(c9-Ca)))/(0.5*(mdot_c*c9**2+mdot_f*c19**2- mdot_a*Ca**2))
+    no = nt*np
+    return nt,np,no
 """
 def PolytropicCompressor(PR, Coefficent, P01, T01):
     P02 = PR * P01
