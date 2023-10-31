@@ -57,8 +57,8 @@ def fa_ratio(t04, t03, nb, cp, Q, mdot_f, mdot_c):
 
 def perf_eff(mdot_h, mdot_c, mdot_f, c9, c19, Ca, Qf):
     mdot_a = mdot_f + mdot_c
-    nt = (0.5 * (mdot_c * c9 ** 2 + mdot_f * c19 ** 2 - mdot_a * Ca ** 2)) / (mdot_h * Qf)
-    np = (Ca * (mdot_f * (c19 - Ca) + mdot_c * (c9 - Ca))) / (
+    nt = 1/(0.5 * (mdot_c * c9 ** 2 + mdot_f * c19 ** 2 - mdot_a * Ca ** 2)) / (mdot_h * Qf)
+    np = 1/(Ca * (mdot_f * (c19 - Ca) + mdot_c * (c9 - Ca))) / (
             0.5 * (mdot_c * c9 ** 2 + mdot_f * c19 ** 2 - mdot_a * Ca ** 2))
     no = nt * np
     return nt, np, no

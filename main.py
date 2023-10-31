@@ -1,6 +1,10 @@
 import numpy as np
+from numpy import sqrt as sqrt
+from numpy import linspace
+from numpy import array 
 from Classes.EngineStates import *
 from Equations.Equations import *
+import matplotlib.pyplot as plt
 
 # Initial Values for Static Values
 h = 11  # Km
@@ -99,21 +103,23 @@ M19 = nozzle.Mach(T02_1, T19, Yc)
 V19 = M19 * np.sqrt(Yc * R * T19)
 
 massTotal, mdot_c, mdot_f = combustor.massflow(BPR, V0, V9, V19, D)
-f, MassFlowFuel = combustor.FAR(Cph, Cpc, T03, T04, HFuel, CombustorEfficiency, mdot_c)
+f0, MassFlowFuel = combustor.FAR(Cph, Cpc, T03, T04, HFuel, CombustorEfficiency, mdot_c)
 
 
 
-F_m0 = F_m0(D, mdot_f, mdot_c)
-TSFC = TSFC(D,massTotal,MassFlowFuel)
-fa_ratio, mdot_h = fa_ratio(T04, T03, CombustorEfficiency, Cpc, HFuel, mdot_f, mdot_c)
-nt, np, no = perf_eff(mdot_h, mdot_c, mdot_f, V9, V19, V0, HFuel)
-
+F_m00 = F_m0(D, mdot_f, mdot_c)
+TSFC0 = TSFC(D,massTotal,MassFlowFuel)
+fa_ratio0, mdot_h0 = fa_ratio(T04, T03, CombustorEfficiency, Cpc, HFuel, mdot_f, mdot_c)
+##
+nt0, np0, no0 = perf_eff(MassFlowFuel, mdot_c, mdot_f, V9, V19, V0, HFuel)
+#print(mdot_c,mdot_f,mdot_h0,MassFlowFuel)
+print(F_m00,nt0,np0,no0)
 
 ###################
 #Initial values for Graphs
-BPR_values = np.linspace(5, 20, num=20) #20 values between 5-20 BPR
-FanPR_values = np.linspace(1.2, 2.0, num=20) #20 values between 1.2-2.0 Fan pressure ratio
-CompPR_values = np.linspace(20, 40, num=20) #20 values between 20-40 compressor pressure ratio
+BPR_values = linspace(5, 20, num=100,dtype=None) #20 values between 5-20 BPR
+FanPR_values = linspace(1.2, 2.0, num=100,dtype=float) #20 values between 1.2-2.0 Fan pressure ratio
+CompPR_values = linspace(20, 40, num=100,dtype=float) #20 values between 20-40 compressor pressure ratio
 
 #Data Lists for Graphs
 #Data when BPR changes 
@@ -166,24 +172,25 @@ def solve_engine(BPR, fan_PR, comp_PR):
     P9 = PAmbient
     T9 = nozzle.temperature(NozzleEfficiency, T05, PAmbient, P05, Yh)
     M9 = nozzle.Mach(T05, T9, Yh)
-    V9 = M9 * np.sqrt(Yh * R * T9)
-    print("Mach is:", M9)
-    print("Velocity is:", V9)
+    V9 = M9 * sqrt(Yh * R * T9)
 
-    mdot_f = 0
-    mdot_c = 0
+    #mdot_f = 0
+    #mdot_c = 0
     P19=PAmbient
     T19 = nozzle.temperature(NozzleEfficiency, T02_1, PAmbient, P02_1, Yh)
     M19 = nozzle.Mach(T02_1, T19, Yh)
-    V19 = M19 * np.sqrt(Yh * R * T19)
+    V19 = M19 * sqrt(Yh * R * T19)
 
-    F_m0 = F_m0(D,mdot_f,mdot_c)
-    TSFC = TSFC(D,mdot_f)
-    fa_ratio,mdot_h = fa_ratio(T04,T03,CombustorEfficiency,Cpc,HFuel,mdot_f,mdot_c)
-    n_t,n_p,n_o = perf_eff(mdot_h,mdot_c,mdot_f,V9,V19,V0,HFuel)
-    f=0
+    massTotal, mdot_c, mdot_f = combustor.massflow(BPR, V0, V9, V19, D)
+    f1, MassFlowFuel = combustor.FAR(Cph, Cpc, T03, T04, HFuel, CombustorEfficiency, mdot_c)
+    ##print(D,mdot_f,mdot_c)
+    F_m01 = F_m0(D,mdot_f,mdot_c)
+    TSFC1 = TSFC(D,massTotal,MassFlowFuel)
+    fa_ratio1,mdot_h = fa_ratio(T04,T03,CombustorEfficiency,Cpc,HFuel,mdot_f,mdot_c)
+    n_t1,n_p1,n_o1 = perf_eff(MassFlowFuel,mdot_c,mdot_f,V9,V19,V0,HFuel)
+    #f=0
 
-    x = np.array([F_m0, TSFC, f, n_t, n_p, n_o]) #array with holding the calculated parameters
+    x = array([F_m01, TSFC1, f1, n_t1, n_p1, n_o1]) #array with holding the calculated parameters
 
     return x
 
@@ -226,7 +233,7 @@ for i in CompPR_values:
 
 #Graph for BPR
 
-fig1, ax1 = plt.subplot(nrows = 2, ncols=3)
+fig1, ax1 = plt.subplots(nrows = 2, ncols=3)
 
 ax1[0,0].plot(BPR_values, BPR_fs_data)
 ax1[0,1].plot(BPR_values, BPR_f_data)
@@ -239,7 +246,7 @@ ax1[1,2].plot(BPR_values,BPR_eta_o_data)
 
 
 #Graph for Fan Pressure Ratio
-fig2, ax2 = plt.subplot(nrows = 2, ncols=3)
+fig2, ax2 = plt.subplots(nrows = 2, ncols=3)
 
 ax2[0,0].plot(FanPR_values, Fan_fs_data)
 ax2[0,1].plot(FanPR_values, Fan_f_data)
@@ -252,7 +259,7 @@ ax2[1,2].plot(FanPR_values,Fan_eta_o_data)
 
 
 #Graph for Compressor Pressure Ratio
-fig3,ax3 = plt.subplot(nrow = 2, ncols = 3)
+fig3,ax3 = plt.subplots(nrows = 2, ncols = 3)
 
 ax3[0,0].plot(CompPR_values, Comp_fs_data)
 ax3[0,1].plot(CompPR_values, Comp_f_data)
@@ -264,3 +271,4 @@ ax3[1,2].plot(CompPR_values,Comp_eta_o_data)
 
 
 
+plt.show()
