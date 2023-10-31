@@ -73,7 +73,7 @@ def PolytropicTurbine(Cpc,Cph,nm,DeltaT, Coefficent, P01, T01):
 class inlet:
     @staticmethod
     def Temp(velocity, Cp, T0):
-        T02 = T0 + velocity ** 2 / (2 * Cp)
+        T02 = T0 + 0.98*(velocity ** 2 / (2 * Cp))
         return T02
 
     @staticmethod
