@@ -42,8 +42,10 @@ def F_m0(drag, mdot_f, mdot_c):
     return F_m0
 
 
-def TSFC(drag, mdot_f):
-    TSFC = mdot_f / drag
+def TSFC(drag, MassAir,MassFuel):
+    Temp1 = MassFuel/ MassAir
+    Temp2 = drag / MassAir
+    TSFC = Temp1 / Temp2
     return TSFC
 
 
@@ -60,6 +62,7 @@ def perf_eff(mdot_h, mdot_c, mdot_f, c9, c19, Ca, Qf):
             0.5 * (mdot_c * c9 ** 2 + mdot_f * c19 ** 2 - mdot_a * Ca ** 2))
     no = nt * np
     return nt, np, no
+
 
 
 """

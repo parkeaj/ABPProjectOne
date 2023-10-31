@@ -102,6 +102,8 @@ V19 = M19 * np.sqrt(Yc * R * T19)
 MassFlowCore, MassFlowNonCore = combustor.massflow(BPR, V0, V9, V19, D)
 f, MassFlowFuel = combustor.FAR(Cph, Cpc, T03, T04, HFuel, CombustorEfficiency, MassFlowCore)
 
+
+
 F_m0 = F_m0(D, mdot_f, mdot_c)
 TSFC = TSFC(D, mdot_f)
 fa_ratio, mdot_h = fa_ratio(T04, T03, CombustorEfficiency, Cpc, HFuel, mdot_f, mdot_c)
